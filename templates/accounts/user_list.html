@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="card">
+  <h2>Usuarios</h2>
+  <p class="muted">Solo visible para administradores (staff).</p>
+</div>
+<div class="card" style="overflow:auto;">
+  <table style="width:100%; border-collapse:collapse;">
+    <thead>
+      <tr>
+        <th style="text-align:left; padding:8px;">Usuario</th>
+        <th style="text-align:left; padding:8px;">Email</th>
+        <th style="text-align:left; padding:8px;">Staff</th>
+        <th style="text-align:left; padding:8px;">Superusuario</th>
+        <th style="text-align:left; padding:8px;">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr style="border-top:1px solid #333;">
+        <td style="padding:8px;">{{ u.username }}{% if u.is_superuser or u.is_staff %} <span class="badge-admin">✔</span>{% endif %}</td>
+        <td style="padding:8px;">{{ u.email|default:"—" }}</td>
+        <td style="padding:8px;">{{ u.is_staff }}</td>
+        <td style="padding:8px;">{{ u.is_superuser }}</td>
+        <td style="padding:8px;">
+          <form action="{% url 'accounts:toggle_staff' u.pk %}" method="post" style="display:inline-block;">{% csrf_token %}
+            <button class="btn" type="submit">{% if u.is_staff %}Quitar staff{% else %}Hacer staff{% endif %}</button>
+          </form>
+          <form action="{% url 'accounts:toggle_superuser' u.pk %}" method="post" style="display:inline-block;">{% csrf_token %}
+            <button class="btn" type="submit">{% if u.is_superuser %}Quitar super{% else %}Hacer super{% endif %}</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

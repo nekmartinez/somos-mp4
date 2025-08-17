@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<h2>Mensajes recientes</h2>
+{% if comments %}
+    <ul style="list-style:none; padding-left:0;">
+        {% for c in comments %}
+            <li class="card">
+                <p class="meta">{{ c.created_at }} — en <a href="{% url 'pages:page_detail' c.page.id %}">{{ c.page.title }}</a> por <a href="{% url 'accounts:profile_detail' c.author.username %}">{{ c.author.username }}</a></p>
+                <p>{{ c.body }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No hay mensajes todavía.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load user_extras %}
+{% block content %}
+<h2>Páginas</h2>
+
+<form method="get" class="card">
+    <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Buscar...">
+    <div class="actions">
+        <button class="btn" style="font-size:1rem;" type="submit">Buscar</button>
+        {% if perms.pages.add_page %}
+          <a class="btn" style="font-size:1rem;" href="{% url 'pages:page_create' %}">Crear nueva</a>
+        {% endif %}
+    </div>
+</form>
+
+{% if pages %}
+  <div class="grid">
+    {% for p in pages %}
+      <article class="card">
+        {% if p.image %}
+          <img class="page-img" src="{{ p.image.url }}" alt="{{ p.title }}">
+        {% endif %}
+        <h3>{{ p.title }}</h3>
+        {% if p.subtitle %}<p class="muted">{{ p.subtitle }}</p>{% endif %}
+
+        <p class="meta">
+          Publicado: {{ p.published_at }}
+          {% if p.author %} — {% username_with_badge p.author %}{% endif %}
+        </p>
+
+        <a class="btn" href="{% url 'pages:page_detail' p.pk %}">Leer más</a>
+      </article>
+    {% endfor %}
+  </div>
+{% else %}
+  <p>No hay páginas aún.</p>
+{% endif %}
+{% endblock %}

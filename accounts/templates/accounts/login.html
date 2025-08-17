@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<h2>Ingresar</h2>
+
+<style>
+  .btn-auth { font-size: 1rem; line-height: 1.1; }
+</style>
+
+<form method="post" class="card">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="actions">
+        <button class="btn btn-auth" type="submit">Entrar</button>
+        <a class="btn btn-auth" href="{% url 'accounts:signup' %}">Crear cuenta</a>
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<h2>Registrarse</h2>
+<form method="post" enctype="multipart/form-data" class="card">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="actions">
+        <button class="btn" type="submit">Crear cuenta</button>
+    </div>
+</form>
+{% endblock %}

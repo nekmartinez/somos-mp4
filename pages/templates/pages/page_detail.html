@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load user_extras %}
+{% block content %}
+<article class="card">
+    <h2>{{ page.title }}</h2>
+    {% if page.subtitle %}<p class="muted">{{ page.subtitle }}</p>{% endif %}
+    {% if page.image %}<img class="page-img" src="{{ page.image.url }}" alt="">{% endif %}
+    <div style="margin-top:12px;">{{ page.content|safe }}</div>
+
+    {% if page.link_url %}
+      <p style="margin-top:12px;">
+        <a class="btn" href="{{ page.link_url }}" target="_blank" rel="noopener">
+          {{ page.link_text|default:"Abrir enlace" }}
+        </a>
+      </p>
+    {% endif %}
+
+    <p class="meta">
+      Publicado: {{ page.published_at }}
+      {% if page.author %} • por {% username_with_badge page.author %}{% endif %}
+    </p>
+
+{% if user.is_staff or user.is_superuser %}
+    <div class="actions">
+        <a class="btn" href="{% url 'pages:page_update' page.pk %}">Editar</a>
+        <a class="btn" href="{% url 'pages:page_delete' page.pk %}">Borrar</a>
+    </div>
+{% endif %}
+</article>
+<section class="card">
+    <h3>Comentarios</h3>
+    {% include 'messaging/comment_list.html' with page=page %}
+</section>
+{% endblock %}

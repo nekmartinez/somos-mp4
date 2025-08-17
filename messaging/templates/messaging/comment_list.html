@@ -1,0 +1,109 @@
+{% load static %}
+<style>
+  .cmt-row{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:start}
+  .cmt-avatar{width:40px}
+  .avatar-sm{width:36px;height:36px;border-radius:50%;object-fit:cover;display:block;background:#2a2a35}
+  .avatar-fallback{width:36px;height:36px;border-radius:50%;display:block}
+</style>
+
+{% if user.is_authenticated %}
+    <form method="post" action="{% url 'messaging:add_comment' page.id %}" style="margin-bottom:12px;">
+        {% csrf_token %}
+        <textarea name="body" rows="3" placeholder="Escribí tu comentario…" required></textarea>
+        <div class="actions">
+            <button class="btn" type="submit">Comentar</button>
+        </div>
+    </form>
+{% else %}
+    <p class="muted">Iniciá sesión para comentar.</p>
+{% endif %}
+
+{% if page.comments.all %}
+    <ul style="list-style:none; padding-left:0;">
+        {% for c in page.comments.all %}
+            {% if not c.parent %}
+            <li class="card" style="margin-bottom:12px;">
+              <div class="cmt-row">
+                <div class="cmt-avatar">
+                  {% if c.author.profile and c.author.profile.avatar %}
+                    <img class="avatar-sm" src="{{ c.author.profile.avatar.url }}" alt="Avatar de {{ c.author.username }}">
+                  {% else %}
+                    <svg class="avatar-sm avatar-fallback" viewBox="0 0 24 24" aria-hidden="true">
+                      <circle cx="12" cy="12" r="12" fill="#2a2a35"/>
+                      <path d="M12 12.8c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4Zm0 2c-3.33 0-6 2.17-6 4.84 0 .2.16.36.36.36h11.28c.2 0 .36-.16.36-.36C18 16.97 15.33 14.8 12 14.8Z" fill="#6c6c7a"/>
+                    </svg>
+                  {% endif %}
+                </div>
+
+                <div class="cmt-main">
+                  <p class="meta">
+                    <a href="{% url 'accounts:profile_detail' c.author.username %}">{{ c.author.username }}</a> — {{ c.created_at }}
+                  </p>
+
+                  <p>{{ c.body }}</p>
+
+                  <form method="post" action="{% url 'messaging:toggle_like' c.id %}" style="display:inline-block; margin-top:6px;">
+                      {% csrf_token %}
+                      <button type="submit" style="font-size:12px; padding:2px 8px; line-height:1.1; border-radius:8px;">
+                          {% if user.is_authenticated and user in c.likes.all %}❤️{% else %}🤍{% endif %}
+                          {% with c.likes.count as cnt %}{{ cnt }}{% endwith %}
+                      </button>
+                  </form>
+
+                  {# Responder #}
+                  {% if user.is_authenticated %}
+                  <form method="post" action="{% url 'messaging:add_reply' page.id c.id %}" style="margin-left:0; margin-top:8px;">
+                      {% csrf_token %}
+                      <textarea name="body" rows="2" placeholder="Responder…" required></textarea>
+                      <div class="actions">
+                          <button class="btn" type="submit">Responder</button>
+                      </div>
+                  </form>
+                  {% endif %}
+
+                  {# Hijos #}
+                  {% if c.replies.all %}
+                  <ul style="list-style:none; padding-left:16px; margin-top:8px;">
+                      {% for r in c.replies.all %}
+                          <li class="card" style="background:#1112; border-left:3px solid #888; margin-bottom:8px;">
+                            <div class="cmt-row">
+                              <div class="cmt-avatar">
+                                {% if r.author.profile and r.author.profile.avatar %}
+                                  <img class="avatar-sm" src="{{ r.author.profile.avatar.url }}" alt="Avatar de {{ r.author.username }}">
+                                {% else %}
+                                  <svg class="avatar-sm avatar-fallback" viewBox="0 0 24 24" aria-hidden="true">
+                                    <circle cx="12" cy="12" r="12" fill="#2a2a35"/>
+                                    <path d="M12 12.8c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4Zm0 2c-3.33 0-6 2.17-6 4.84 0 .2.16.36.36.36h11.28c.2 0 .36-.16.36-.36C18 16.97 15.33 14.8 12 14.8Z" fill="#6c6c7a"/>
+                                  </svg>
+                                {% endif %}
+                              </div>
+
+                              <div class="cmt-main">
+                                <p class="meta">
+                                  <a href="{% url 'accounts:profile_detail' r.author.username %}">{{ r.author.username }}</a> — {{ r.created_at }}
+                                </p>
+
+                                <p>{{ r.body }}</p>
+
+                                <form method="post" action="{% url 'messaging:toggle_like' r.id %}" style="display:inline-block; margin-top:6px;">
+                                    {% csrf_token %}
+                                    <button type="submit" style="font-size:12px; padding:2px 8px; line-height:1.1; border-radius:8px;">
+                                        {% if user.is_authenticated and user in r.likes.all %}❤️{% else %}🤍{% endif %}
+                                        {% with r.likes.count as cnt %}{{ cnt }}{% endwith %}
+                                    </button>
+                                </form>
+                              </div>
+                            </div>
+                          </li>
+                      {% endfor %}
+                  </ul>
+                  {% endif %}
+                </div>
+              </div>
+            </li>
+            {% endif %}
+        {% empty %}
+            <p>No hay comentarios aún.</p>
+        {% endfor %}
+    </ul>
+{% endif %}

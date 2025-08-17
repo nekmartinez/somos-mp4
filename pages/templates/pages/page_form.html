@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<h2>{% if form.instance.pk %}Editar página{% else %}Crear página{% endif %}</h2>
+<form method="post" enctype="multipart/form-data" class="card">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="actions">
+        <button class="btn" type="submit">Guardar</button>
+        <a class="btn" href="{% url 'pages:page_list' %}">Volver</a>
+    </div>
+</form>
+{% endblock %}

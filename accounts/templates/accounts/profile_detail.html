@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load user_extras %}
+
+{% block content %}
+<div class="card">
+  <h2>{% username_with_badge profile_user %}</h2>
+</div>
+
+<div class="card" style="display:flex; gap:16px; align-items:flex-start;">
+  <div>
+    {% if profile_user.profile.avatar %}
+      <img src="{{ profile_user.profile.avatar.url }}" alt="avatar" class="avatar">
+    {% else %}
+      <svg class="avatar" viewBox="0 0 24 24" aria-hidden="true" style="display:block;border-radius:12px;background:#2a2a35;">
+        <circle cx="12" cy="12" r="12" fill="#2a2a35"/>
+        <path d="M12 12.8c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4Zm0 2c-3.33 0-6 2.17-6 4.84 0 .2.16.36.36.36h11.28c.2 0 .36-.16.36-.36C18 16.97 15.33 14.8 12 14.8Z" fill="#6c6c7a"/>
+      </svg>
+    {% endif %}
+  </div>
+
+  <div style="flex:1;">
+    {% if profile_user.first_name or profile_user.last_name %}
+      <p><strong>Nombre:</strong> {{ profile_user.first_name }} {{ profile_user.last_name }}</p>
+    {% endif %}
+
+    {% if profile_user.profile.website %}
+      <p><strong>Enlace:</strong>
+        <a href="{{ profile_user.profile.website }}" target="_blank" rel="noopener">
+          {{ profile_user.profile.website }}
+        </a>
+      </p>
+    {% endif %}
+
+    {% if profile_user.profile.instagram %}
+      <p><strong>Instagram:</strong>
+        <a href="https://instagram.com/{{ profile_user.profile.instagram|cut:'@' }}" target="_blank" rel="noopener">
+          {{ profile_user.profile.instagram }}
+        </a>
+      </p>
+    {% endif %}
+
+    {% if profile_user.profile.birthday %}
+      <p><strong>Cumpleaños:</strong> {{ profile_user.profile.birthday|date:"d/m/Y" }}</p>
+    {% endif %}
+
+    {% if profile_user.profile.bio %}
+      <p><strong>Bio:</strong> {{ profile_user.profile.bio }}</p>
+    {% endif %}
+
+    <div class="actions" style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="btn" type="button" onclick="history.back()">Volver</button>
+      {% if user.username == profile_user.username %}
+        <a class="btn" href="{% url 'accounts:profile_edit' %}">Editar mi perfil</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
